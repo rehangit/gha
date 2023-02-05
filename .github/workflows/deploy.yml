@@ -1,0 +1,19 @@
+name: ♺ deploy 
+
+on:
+    workflow_call:
+        inputs:
+            env:
+                description: Environment to deploy to
+                required: true
+                type: string
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - run: echo "Running deployment on ${{ inputs.env }}..."
+            - run: echo "base_ref=${{ github.event.base_ref }}"
+            - run: echo "master_branch='refs/heads/${{ github.event.repository.master_branch }}'"
+
+     
