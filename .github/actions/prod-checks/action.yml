@@ -1,0 +1,28 @@
+name: Prod checks
+description: "Checks if ok to deploy on prod env"
+runs:
+  using: composite
+  steps:
+    - name: dump github
+      env:
+        GITHUB_VAR: ${{ toJson(github) }}
+      shell: bash
+      run: echo "$GITHUB_VAR"
+
+    - name: check if on default branch
+      shell: bash
+      run: |
+        [ "${{ github.event.base_ref }}" == "refs/heads/${{ github.event.repository.master_branch }}" ]
+
+    - name: check commit hash has stage tag
+      shell: bash
+      run: |
+        echo "Expecting to find tag $GITHUB_REF_NAME-rc.* on the commit hash"
+        LOG=$(git log -1 --pretty='%D')
+        echo LOG=$LOG
+        if [[ $LOG =~ .*"$GITHUB_REF_NAME-rc." ]]
+          then echo "✔︎ Stage tag exists"
+        else 
+          echo "✘ No stage tag exists on this commit hash: $GITHUB_SHA. Deploy to stage before deploying to prod"
+          exit 2
+        fi
