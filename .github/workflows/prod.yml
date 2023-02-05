@@ -1,0 +1,47 @@
+name: Tag deploy prod
+
+on:
+    push:
+        branches-ignore:
+            - '**'
+        tags:
+            - v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+    Check:
+        runs-on: ubuntu-latest
+        steps:
+          - name: dump github
+            env:
+              GITHUB_VAR: ${{ toJson(github) }}
+            run: echo "$GITHUB_VAR"
+
+
+          - name: check if on main
+            env:
+              REF: ${{ github.event.base_ref }}
+              MAIN: refs/heads/${{ github.event.repository.master_branch }}
+            run: |
+              if [ "$REF" != "$MAIN" ]; then echo "ERROR: Not on main branch"; exit 1; fi
+
+          - uses: actions/checkout@v3
+
+          - name: check commit hash has stage tag
+            run: |
+              echo "Expecting to find tag $GITHUB_REF_NAME-rc.* on the commit hash"
+              git pull --tags
+              git tag --points-at 
+            # STAGE_TAG="$(git tag --points-at HEAD | grep "$GITHUB_REF_NAME-rc.")"
+            # echo "STAGE_TAG=$STAGE_TAG"
+            # if [[ -z $STAGE_TAG ]]
+            # then 
+            #   echo "No stage tag exists on HEAD commit hash. Must deploy to stage before deploying to prod"
+            #   exit 2
+            # fi
+
+    Deploy-prod:
+        needs: [Check]
+        uses: ./.github/workflows/deploy.yml
+        with:
+            env: prod
+        secrets: inherit
