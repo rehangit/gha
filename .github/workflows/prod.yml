@@ -1,0 +1,41 @@
+name: Tag deploy prod
+
+on:
+    push:
+        branches-ignore:
+            - '**'
+        tags:
+            - v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+    ProdChecks:
+        runs-on: ubuntu-latest
+        steps:
+          - name: dump github
+            env:
+              GITHUB_VAR: ${{ toJson(github) }}
+            run: echo "$GITHUB_VAR"
+
+          - uses: actions/checkout@v3
+            with:
+              fetch-depth: 0
+
+          - name: check commit hash has stage tag
+            run: |
+              echo "Expecting to find tag $GITHUB_REF_NAME-rc.* on the commit hash"
+              LOG=$(git log -1 --pretty='%D')
+              echo LOG=$LOG
+              if [[ $LOG =~ .*"$GITHUB_REF_NAME-rc." ]]
+                then echo "Stage tag exists"
+              else 
+                echo "No stage tag exists the commit. Must deploy to stage before deploying to prod"
+                exit 2
+              fi
+
+    Deploy-prod:
+        needs: [ProdChecks]
+        if: ${{ github.event.base_ref }} == 'refs/heads/${{ github.event.repository.master_branch }}'
+        uses: ./.github/workflows/deploy.yml
+        with:
+            env: prod
+        secrets: inherit
