@@ -22,9 +22,7 @@ jobs:
 
           - name: check if on default branch
             run: |
-              BASE_REF=${{ github.event.base_ref }}
-              DEFAULT=refs/heads/${{ github.event.repository.master_branch }}
-              [[ $BASE_REF == $DEFAULT ]]
+              [ "${{ github.event.base_ref }}" == "refs/heads/${{ github.event.repository.master_branch }}" ]
 
           - name: check commit hash has stage tag
             run: |
