@@ -1,5 +1,7 @@
 name: Prod checks
+
 description: "Checks if ok to deploy on prod env"
+
 runs:
   using: composite
   steps:
