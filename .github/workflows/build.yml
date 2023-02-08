@@ -1,0 +1,37 @@
+name: ♺ build packages
+env:
+    NODE_VERSION: 16
+    JFROG_ARTIFACTORY_TOKEN: ${{ secrets.GLOBAL_JFROG_ARTIFACTORY_TOKEN }}
+
+on:
+    workflow_call:
+        inputs: 
+            packages:
+                description: list of packages
+                required: true
+                type: string
+jobs:
+    pre-build:
+        runs-on: ubuntu-latest
+        outputs:
+            packages_json: ${{ steps.packages.outputs.json }}
+        steps:
+            - id: packages
+              run: |
+                array=$(echo ${{ inputs.packages }} | tr -d ' \[\]' | jq -cR 'split(",")' )
+                echo array=$array
+                echo "json=$array" >> $GITHUB_OUTPUT
+
+    build:
+        needs: pre-build
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                package: ${{ fromJson(needs.pre-build.outputs.packages_json) }}
+        steps:
+            - name: build step ${{ matrix.package }}
+              run: |
+                echo "Building package ${{ matrix.package }}"
+                echo GITHUB_OUTPUT=
+                cat $GITHUB_OUTPUT
+                echo GITHUB_ENV=$(echo $GITHUB_ENV)
