@@ -1,0 +1,11 @@
+name: On Push
+
+on:
+    push:
+    
+jobs:
+    Build:
+        uses: rehangit/gha/.github/workflows/build.yml@master
+        with: 
+          packages: 'a, b, c'
+        secrets: inherit
