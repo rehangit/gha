@@ -1,0 +1,16 @@
+name: release sd-action repo
+
+on:
+  release:
+    types:
+      - "published"
+
+jobs:
+  myjob:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          GITHUB_JSON: ${{ toJson(github) }}
+          echo $GITHUB_JSON
