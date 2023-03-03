@@ -8,7 +8,12 @@ on:
             - v[0-9]+.[0-9]+.[0-9]+
 
 jobs:
+    Check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: rehangit/gha/actions/prod-checks@main
     Deploy-prod:
+        needs: Check
         uses: ./.github/workflows/deploy.yml
         with:
             env: prod
