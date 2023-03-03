@@ -11,7 +11,7 @@ jobs:
     Check:
         runs-on: ubuntu-latest
         steps:
-            - uses: rehangit/gha/actions/prod-checks@main
+            - uses: rehangit/gha/actions/prod-checks@master
     Deploy-prod:
         needs: Check
         uses: ./.github/workflows/deploy.yml
