@@ -9,6 +9,7 @@ on:
 
 jobs:
     Deploy-prod:
+        runs-on: ubuntu-latest
         steps:
             - name: Stage tag check
               if: ${{ inputs.environment == 'prod' }}
