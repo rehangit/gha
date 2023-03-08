@@ -8,13 +8,14 @@ on:
             - v[0-9]+.[0-9]+.[0-9]+
 
 jobs:
-    Check:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: rehangit/gha/actions/prod-checks@master
     Deploy-prod:
-        needs: Check
-        uses: ./.github/workflows/deploy.yml
-        with:
-            env: prod
-        secrets: inherit
+        steps:
+            - name: Stage tag check
+              if: ${{ inputs.environment == 'prod' }}
+              uses: rehangit/gha/actions/prod-checks@master
+
+            - name: Deploy
+              uses: ./.github/workflows/deploy.yml
+              with:
+                 env: prod
+                 secrets: inherit
