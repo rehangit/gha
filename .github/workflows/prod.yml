@@ -11,8 +11,7 @@ jobs:
     Deploy-prod:
         runs-on: ubuntu-latest
         steps:
-            - name: Stage tag check
-              if: ${{ inputs.environment == 'prod' }}
+            - name: Prod check
               uses: rehangit/gha/actions/prod-checks@master
 
             - name: Deploy
